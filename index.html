@@ -1,0 +1,493 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>html{color-scheme:light dark}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+<title>Eleição Presidencial Brasil 2026</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: placar em linha no topo (como placar de jogo), mapa grande com balões de % por país, detalhe em tabela recolhível. */
+:root{
+  --bg:#f3f4f6; --surface:#ffffff; --fg:#14161c; --muted:#5b6170; --line:#d9dce3; --soft:#e9ebf0;
+  --lula:#c21e2e; --flavio:#1d4fa3; --sem:#cfd3db; --ok:#1f8a4c; --warn:#b26a00; --balao:#ffffff;
+  --display:"Archivo",system-ui,sans-serif; --body:"IBM Plex Sans",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#101216; --surface:#181b21; --fg:#eceef2; --muted:#9aa1b0; --line:#2a2f3a; --soft:#20242c;
+  --lula:#e0505e; --flavio:#5b8de0; --sem:#2f3440; --ok:#4fc27d; --warn:#e2a23a; --balao:#1e2229; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#101216; --surface:#181b21; --fg:#eceef2; --muted:#9aa1b0; --line:#2a2f3a; --soft:#20242c;
+  --lula:#e0505e; --flavio:#5b8de0; --sem:#2f3440; --ok:#4fc27d; --warn:#e2a23a; --balao:#1e2229; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.45;margin:0}
+html.fixo,html.fixo body{overflow:hidden;height:100%;overscroll-behavior:none}
+html.fixo .wrap{padding-bottom:0}
+.lateral{max-height:calc(100vh - 90px);overflow:auto}
+.wrap{max-width:1600px;margin:0 auto;padding-block:0 48px;padding-inline:16px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:4px 18px;padding-block:4px 0}
+h1{font-family:var(--display);font-weight:800;font-size:1.25rem;letter-spacing:-.01em;margin:0}
+.status{margin-left:auto;font-size:.74rem;color:var(--muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok);display:inline-block}
+.dot.off{background:var(--warn)}
+nav{display:flex;gap:2px;overflow-x:auto;margin:0;align-self:stretch}
+nav button{font:600 .85rem var(--body);background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:9px 12px;cursor:pointer;white-space:nowrap}
+nav button[aria-selected="true"]{color:var(--fg);border-color:var(--fg)}
+nav button:focus-visible{outline:2px solid var(--flavio);outline-offset:-2px}
+section[role="tabpanel"]{padding-top:8px}
+.aviso{font-size:.82rem;color:var(--muted);padding:6px 0 10px}
+.aviso b{color:var(--fg)}
+/* placar em linha */
+.score{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px 16px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:12px 18px;margin-bottom:10px}
+.score .lado{display:flex;align-items:center;gap:14px;min-width:0}
+.score .lado.dir{flex-direction:row-reverse;text-align:right}
+.score .nm{font:800 1rem var(--display);text-transform:uppercase;letter-spacing:.05em;line-height:1.1}
+.score .nm small{display:block;font:500 .74rem var(--body);text-transform:none;letter-spacing:0;color:var(--muted);font-variant-numeric:tabular-nums;margin-top:2px}
+.score .pct{font:900 3rem/1 var(--display);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.score .pct.l{color:var(--lula)}.score .pct.f{color:var(--flavio)}
+.score .x{font:700 1.2rem var(--display);color:var(--muted)}
+.faixa{display:flex;flex-wrap:wrap;align-items:center;gap:8px 22px;font-size:.84rem;color:var(--muted);padding:2px 4px 12px}
+.faixa svg{width:34px;height:34px;flex:none}
+.faixa b{color:var(--fg);font-variant-numeric:tabular-nums;font-weight:600}
+.faixa .big{font:800 1.15rem var(--display);color:var(--fg)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:12px 14px;min-width:0}
+.card h2{font:700 .76rem var(--display);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 8px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.mapa{position:relative}
+.mapa svg{width:100%;height:auto;display:block;touch-action:none}
+.mapa .painel rect{fill:var(--surface);fill-opacity:.92;stroke:var(--line);stroke-width:.6}
+.mapa .painel text{font-family:var(--display);font-variant-numeric:tabular-nums}
+.mapa path.pais{stroke:var(--surface);stroke-width:.4}
+.mapa circle.cid{stroke:var(--surface);stroke-width:1;pointer-events:none}
+.mapa path.uf{stroke:var(--surface);stroke-width:.8}
+.mapa text.nome{font-family:var(--body);font-weight:600;fill:var(--fg);fill-opacity:.85;pointer-events:none;text-anchor:middle;paint-order:stroke;stroke:var(--surface);stroke-width:.5px;stroke-opacity:.6}
+.mapa .balao rect{fill:var(--balao);stroke:var(--line);stroke-width:.6}
+.mapa .balao text{font-family:var(--display);font-weight:800;font-variant-numeric:tabular-nums}
+.mapa .balao.esp rect{stroke-dasharray:2 1.5}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.seg button{font:600 .72rem var(--body);background:var(--surface);color:var(--muted);border:0;padding:4px 9px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.mapa .rotulo text{font-family:var(--body);font-variant-numeric:tabular-nums}
+.mapa .rotulo line{stroke:var(--muted);stroke-width:.6;stroke-opacity:.7}
+.chave{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center;font-size:.8rem}
+.chave svg{width:120px;height:auto}
+.chave .k{color:var(--muted)}
+.estado{display:flex;flex-direction:column;gap:6px;margin-top:10px;font-size:.8rem}
+.estado .pill{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--line);border-radius:4px;color:var(--muted)}
+.estado .pill.on{border-color:var(--fg);color:var(--fg)}
+.estado .pill b{font-weight:600}
+.estado i{width:8px;height:8px;border-radius:50%;background:var(--line);flex:none}
+.estado .pill.on i{background:var(--ok)}
+.gridbr{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:12px;align-items:start}
+.lateral{display:flex;flex-direction:column;gap:12px}
+#mapa-mundo svg{display:block}
+#p-ext .card.mapa{padding:8px 10px}
+#p-ext .card.mapa h2{margin-bottom:4px}
+
+#mapa-br svg{display:block}
+#p-br .card.mapa{padding:8px 10px}
+#p-br .card.mapa h2{margin-bottom:4px}
+
+@media (max-width:900px){.gridbr{grid-template-columns:1fr}}
+.zoom{position:absolute;right:12px;top:36px;display:flex;flex-direction:column;gap:4px}
+.zoom button{width:30px;height:30px;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:4px;font:700 1rem var(--display);cursor:pointer}
+.legenda{display:flex;gap:14px;flex-wrap:wrap;font-size:.78rem;color:var(--muted);margin-top:8px}
+.card.mapa .legenda{position:absolute;right:14px;bottom:12px;margin:0;flex-direction:column;align-items:flex-start;gap:3px;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:6px 10px;font-size:.74rem;pointer-events:none}
+.legenda i{display:inline-block;width:12px;height:12px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.grid2{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:12px}
+details{margin-top:12px}
+summary{cursor:pointer;font:600 .84rem var(--body);color:var(--muted);padding:6px 0}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.85rem}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+th:first-child,td:first-child{text-align:left}
+th{font:600 .7rem var(--body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+td .sw{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.l{color:var(--lula)}.f{color:var(--flavio)}
+.tip{position:fixed;pointer-events:none;background:var(--fg);color:var(--bg);padding:8px 10px;border-radius:4px;font-size:.8rem;line-height:1.35;max-width:280px;z-index:9;opacity:0;transition:opacity .12s}
+.tip b{font-variant-numeric:tabular-nums}
+.mini{font-size:.76rem;color:var(--muted);margin-top:8px}
+.vazio{color:var(--muted);font-size:.9rem;padding:16px 0}
+.tag{display:inline-block;font:600 .66rem var(--body);text-transform:uppercase;letter-spacing:.06em;padding:2px 6px;border-radius:3px;background:var(--soft);color:var(--muted);margin-left:6px;vertical-align:1px}
+.kv{display:grid;grid-template-columns:1fr auto;gap:4px 12px;font-size:.85rem;margin-top:8px}
+.kv b{font-variant-numeric:tabular-nums;font-weight:600}
+/* mídia */
+.quad{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;font-size:.8rem}
+@media (max-width:900px){.quad{grid-template-columns:1fr 1fr}}
+.quad .cel .tit{font:700 .72rem var(--display);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.quad .cab{font:700 .72rem var(--display);text-transform:uppercase;letter-spacing:.06em;text-align:center;padding:4px 0}
+.quad .lin{font:700 .68rem var(--display);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);writing-mode:vertical-rl;transform:rotate(180deg);text-align:center;padding:4px 0}
+.quad .cel{border:1px solid var(--line);border-radius:4px;padding:8px;min-width:0}
+.quad .cel .n{font:800 1.5rem/1 var(--display);font-variant-numeric:tabular-nums}
+.quad .cel .n small{font:500 .72rem var(--body);color:var(--muted);margin-left:6px}
+.quad .cel ul{list-style:none;margin:6px 0 0;padding:0 4px 0 0;max-height:300px;overflow-y:auto;overscroll-behavior:contain}
+.quad .cel .sub{font-size:.7rem;color:var(--muted);line-height:1.3;margin-top:2px}
+.quad .cab small{display:block;font:500 .66rem var(--body);text-transform:none;letter-spacing:0;color:var(--muted)}
+.quad .cel li{font-size:.74rem;line-height:1.3;padding:4px 0;border-top:1px solid var(--line);color:var(--fg)}
+.quad .cel li .meta{color:var(--muted);font-size:.68rem;display:block}
+.quad .cel.odio{border-color:color-mix(in srgb,var(--warn) 50%,var(--line))}
+.badge{display:inline-block;font:600 .66rem var(--body);padding:1px 6px;border-radius:3px;background:var(--soft);color:var(--muted);margin-left:6px;vertical-align:1px}
+.badge.l{color:var(--lula)}.badge.f{color:var(--flavio)}
+.duelo{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.barra{height:14px;border-radius:3px;background:var(--sem);overflow:hidden;display:flex;margin:8px 0 4px}
+.barra i{display:block;height:100%}
+.barra i.l{background:var(--lula)}.barra i.f{background:var(--flavio)}
+.barra-leg{display:flex;justify-content:space-between;font-size:.82rem;font-variant-numeric:tabular-nums}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--soft);border-radius:999px;padding:3px 10px;font-size:.8rem;font-variant-numeric:tabular-nums}
+.chip b{font-weight:600}
+.lista{list-style:none;margin:0;padding:0;font-size:.84rem}
+.lista li{padding:6px 0;border-bottom:1px solid var(--line);line-height:1.35}
+.lista li:last-child{border:0}
+.lista .meta{color:var(--muted);font-size:.74rem;display:block}
+.lista a{color:inherit;text-decoration:none}
+.lista a:hover{text-decoration:underline}
+.hist svg{width:100%;height:auto;display:block}
+@media (max-width:720px){
+  .top{gap:2px 10px}nav{order:3;width:100%;border-top:1px solid var(--line)}.status{margin-left:0}
+  .score{grid-template-columns:1fr auto 1fr;padding:10px 12px}.score .pct{font-size:1.9rem}.score .nm{font-size:.72rem}.score .lado{gap:8px;flex-direction:column;align-items:flex-start}.score .lado.dir{align-items:flex-end}
+  .grid2,.duelo{grid-template-columns:1fr}.zoom{top:30px;right:8px}
+}
+@media (prefers-reduced-motion:reduce){.tip{transition:none}}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="top">
+    <h1>Eleição Presidencial Brasil 2026</h1>
+    <nav role="tablist" id="tabs">
+      <button role="tab" aria-selected="true" data-t="ext">Exterior</button>
+      <button role="tab" aria-selected="false" data-t="br">Brasil</button>
+      <button role="tab" aria-selected="false" data-t="pesq">Pesquisas e mercados</button>
+      <button role="tab" aria-selected="false" data-t="midia">Mídia e redes</button>
+    </nav>
+    <div class="status"><span class="dot" id="dot"></span><span id="st">carregando…</span></div>
+  </div>
+</header>
+
+<section role="tabpanel" id="p-ext">
+  <div class="card mapa"><h2><span>Voto no exterior por país</span><span class="mini" style="margin:0">role para dar zoom · toque no balão para o detalhe</span></h2><div id="mapa-mundo"></div>
+    <div class="zoom"><button id="z-in" aria-label="aproximar">+</button><button id="z-out" aria-label="afastar">−</button><button id="z-reset" aria-label="voltar" style="font-size:.7rem">⟲</button></div>
+    <div class="legenda"><span><i style="background:var(--lula)"></i>Lula à frente</span><span><i style="background:var(--flavio)"></i>Flávio Bolsonaro à frente</span><span><i style="background:var(--sem)"></i>Sem apuração ainda</span><span>balão: <b class="l">% Lula</b> · <b class="f">% Flávio</b></span></div></div>
+</section>
+
+<section role="tabpanel" id="p-br" hidden>
+  <div class="gridbr">
+    <div class="card mapa"><h2><span>Brasil por estado</span><span class="mini" style="margin:0" id="br-modo"></span></h2><div id="mapa-br"></div>
+      <div class="zoom"><button id="zb-in" aria-label="aproximar">+</button><button id="zb-out" aria-label="afastar">−</button><button id="zb-reset" aria-label="voltar" style="font-size:.7rem">⟲</button></div>
+      <div class="legenda" id="leg-br"></div></div>
+    <div class="lateral">
+      <div class="card"><h2>Expectativa das pesquisas por região</h2><div id="reg-br"></div></div>
+      <div class="card"><h2>Como ler o balão</h2><div id="como-ler"></div></div>
+    </div>
+  </div>
+</section>
+
+<section role="tabpanel" id="p-pesq" hidden>
+  <div class="duelo" style="margin-bottom:10px"><div><div class="mini" style="margin:0 0 4px;font-weight:600;text-transform:uppercase;letter-spacing:.06em">Pesquisas</div><div class="score" id="score-pesq" style="margin:0"></div></div><div><div class="mini" style="margin:0 0 4px;font-weight:600;text-transform:uppercase;letter-spacing:.06em">Apostas</div><div class="score" id="score-apostas" style="margin:0"></div></div></div>
+  <div class="faixa" id="faixa-pesq"></div>
+  <div class="grid2">
+    <div class="card tbl"><h2>Últimas pesquisas nacionais (1.º turno)</h2><div id="tab-pesq"></div></div>
+    <div class="card tbl"><h2>Mercados de previsão</h2><div id="mercados" class="vazio">Sem dados ainda.</div><div class="mini">Probabilidade implícita no último preço. Mercados diferentes perguntam coisas diferentes: leia o título de cada linha.</div></div>
+  </div>
+  <div class="card tbl" style="margin-top:12px"><h2>Pesquisa × apuração</h2><div id="comp-pesq"></div></div>
+</section>
+
+<section role="tabpanel" id="p-midia" hidden>
+  <div class="duelo" id="duelo"></div>
+  <div class="card" id="trends-card" style="margin-top:12px" hidden><h2>Google Trends: interesse de busca no Brasil agora</h2><div id="trends"></div></div>
+  <div class="card" style="margin-top:12px"><h2>Decisões da Justiça que podem mudar o rumo</h2><div class="duelo" style="margin:0"><div><div class="cab l" style="font:700 .72rem var(--display);text-transform:uppercase;letter-spacing:.06em;padding:0 0 6px">Favoráveis à esquerda (Lula)</div><ul class="lista" id="jur-lula"></ul></div><div><div class="cab f" style="font:700 .72rem var(--display);text-transform:uppercase;letter-spacing:.06em;padding:0 0 6px">Favoráveis à direita (Flávio)</div><ul class="lista" id="jur-flavio"></ul></div></div><ul class="lista" id="jur-outros" style="margin-top:8px"></ul></div>
+  <div class="duelo" id="duelo-redes" style="margin-top:12px"></div>
+  <div class="card"><h2>Redes: discurso do bem × discurso de ódio</h2><div id="quadrantes"></div></div>
+  <div class="card" style="margin-top:12px"><h2>Nomes, partidos e termos mais mencionados</h2><div class="chips" id="termos"></div><h2 style="margin-top:14px">Hashtags mais usadas</h2><div class="chips" id="chips"></div><div class="mini" id="tags-nota"></div></div>
+  <div class="aviso" id="aviso-midia"></div>
+</section>
+
+</div>
+<div class="tip" id="tip"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const fmt=n=>(n==null?'–':Number(n).toLocaleString('pt-BR'));
+const pct=(a,b)=>b?(100*a/b):0;
+const fp=v=>v.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'%';
+const fp0=v=>Math.round(v)+'%';
+let TR=null, CID={}, NOMEPAIS={}, PAISES=null, BRUF=null, BU=null, LIVE=null, PESQ=null, MID=null, ufSel=null;
+const tip=$('#tip');
+function showTip(ev,html){tip.innerHTML=html;tip.style.opacity=1;const x=Math.min(ev.clientX+14,innerWidth-290),y=Math.min(ev.clientY+14,innerHeight-130);tip.style.left=x+'px';tip.style.top=y+'px'}
+function hideTip(){tip.style.opacity=0}
+const hora=d=>d?new Date(d).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'–';
+const horaCurta=d=>d?new Date(d).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo',hour:'2-digit',minute:'2-digit'}):'';
+
+/* abas */
+$('#tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;ativar(b.dataset.t)});
+function ativar(t){document.querySelectorAll('#tabs button').forEach(x=>x.setAttribute('aria-selected',x.dataset.t===t));document.documentElement.classList.toggle('fixo',t==='ext'||t==='br');
+  document.querySelectorAll('section[role=tabpanel]').forEach(s=>s.hidden=(s.id!=='p-'+t));
+  try{localStorage.setItem('aba',t)}catch(_){} if(LIVE)render()}
+try{const a=localStorage.getItem('aba');if(a)ativar(a)}catch(_){}
+if(/^#(ext|br|pesq|midia)$/.test(location.hash))ativar(location.hash.slice(1));
+
+/* carga */
+async function carregar(){
+  const t=Date.now(), j=u=>fetch(u+'?'+t).then(r=>r.ok?r.json():null).catch(()=>null);
+  const [cid,bu,live,pesq,mid,tr]=await Promise.all([fetch('data/cidades.txt?'+t).then(r=>r.text()),j('data/bu.json'),j('data/live.json'),j('data/pesquisas.json'),j('data/midia.json'),j('data/trends.json')]);TR=tr;
+  CID={};NOMEPAIS={};cid.split('\n').forEach(l=>{const p=l.split('|');if(p.length>=6){CID[p[0]]={nome:p[1],pais:p[2],paisNome:p[3],lat:+p[4],lon:+p[5]};if(!NOMEPAIS[p[2]])NOMEPAIS[p[2]]=p[3].replace(/ \(.*\)/,'')}});
+  BU=bu;LIVE=live;PESQ=pesq;MID=mid;
+  if(!PAISES)PAISES=await fetch('geo/paises.json?v=3').then(r=>r.json());
+  if(!BRUF)BRUF=await fetch('geo/brasil-uf.json?v=3').then(r=>r.json());
+  render();
+}
+
+/* ---------- exterior ---------- */
+function dadosExterior(){
+  const oficial=LIVE&&LIVE.zz&&LIVE.zz.secoes.totalizadas>0;
+  const porPais={}, porCidade=[];
+  if(oficial){
+    for(const [cod,r] of Object.entries(LIVE.cidades||{})){
+      const c=CID[cod];if(!c||!r.secoes.totalizadas)continue;
+      const lula=r.cand['13']?.votos||0,flavio=r.cand['22']?.votos||0,validos=r.votos.validos||0,restante=Math.max(0,(r.votos.total||0)-lula-flavio);
+      porCidade.push({cod,nome:c.nome,lat:c.lat,lon:c.lon,lula,flavio,validos,restante});
+      const p=porPais[c.pais]||(porPais[c.pais]={pais:c.pais,nome:c.paisNome,lula:0,flavio:0,validos:0,restante:0,cidades:[],situacao:'oficial',lat:0,lon:0,n:0});
+      p.lula+=lula;p.flavio+=flavio;p.validos+=validos;p.restante+=restante;p.cidades.push(c.nome);p.lat+=c.lat;p.lon+=c.lon;p.n++;
+    }
+  } else {
+    for(const e of BU.entradas){
+      const cs=e.cidades.map(c=>CID[c]).filter(Boolean);
+      const p=porPais[e.pais]||(porPais[e.pais]={pais:e.pais,nome:e.nome.replace(' (continental)',''),lula:0,flavio:0,validos:0,restante:0,cidades:[],situacao:e.situacao,fonte:e.fonte,nota:e.nota||'',lat:0,lon:0,n:0});
+      const totE=e.comparecimento||e.validos||(e.lula+e.flavio),restE=Math.max(0,totE-e.lula-e.flavio);
+      p.lula+=e.lula;p.flavio+=e.flavio;p.validos+=(e.validos||e.lula+e.flavio);p.restante+=restE;if(e.situacao==='parcial')p.situacao='parcial';
+      cs.forEach(c=>{p.cidades.push(c.nome);p.lat+=c.lat;p.lon+=c.lon;p.n++});
+      porCidade.push({cod:e.cidades.join('+'),nome:e.nome,lat:d3.mean(cs,c=>c.lat),lon:d3.mean(cs,c=>c.lon),lula:e.lula,flavio:e.flavio,validos:e.validos||e.lula+e.flavio,restante:restE});
+    }
+  }
+  const lista=Object.values(porPais).map(p=>({...p,lat:p.lat/p.n,lon:p.lon/p.n})).sort((a,b)=>(b.lula+b.flavio)-(a.lula+a.flavio));
+  const tot={lula:d3.sum(lista,d=>d.lula),flavio:d3.sum(lista,d=>d.flavio),validos:d3.sum(lista,d=>d.validos),restante:d3.sum(lista,d=>d.restante||0)};
+  return {oficial,lista,porCidade,tot};
+}
+function score(el,tot,sub){
+  const b=tot.lula+tot.flavio;
+  el.innerHTML=`<div class="lado"><div class="pct l">${fp(pct(tot.lula,b))}</div><div class="nm">Lula<small>${sub?sub.l:fmt(tot.lula)+' votos'}</small></div></div><div class="x">×</div><div class="lado dir"><div class="pct f">${fp(pct(tot.flavio,b))}</div><div class="nm">Flávio Bolsonaro<small>${sub?sub.f:fmt(tot.flavio)+' votos'}</small></div></div>`;
+}
+function donut(p){const r=15,ci=9,a=d3.arc().innerRadius(ci).outerRadius(r);return `<svg viewBox="-17 -17 34 34" aria-hidden="true"><path d="${a({startAngle:2*Math.PI*p,endAngle:2*Math.PI})}" fill="var(--sem)"></path><path d="${a({startAngle:0,endAngle:2*Math.PI*p})}" fill="var(--fg)"></path></svg>`}
+function faixa(el,feito,total,rotulo,extras){
+  const p=total?feito/total:0;
+  el.innerHTML=`<span style="display:flex;align-items:center;gap:8px">${donut(p)}<span><span class="big">${fp(100*p)}</span> ${rotulo} <b>(${fmt(feito)} de ${fmt(total)})</b></span></span>`+extras.map(([k,v])=>`<span>${k}: <b>${v}</b></span>`).join('');
+}
+
+/* balões: caixa com dois percentuais, posicionada em coordenadas de tela, com empurrão para não sobrepor */
+function balões(layer,items,u,onTip,extraClass){
+  const comEsp=items.some(it=>it.esp);const H=(comEsp?36:26)*u,fs=10.5*u,fn=7.2*u,fe=6.6*u,gap=3*u;
+  items.forEach(it=>{it.W=Math.max(comEsp?66:58,it.nome.length*4.6+8)*u});
+  items.sort((a,b)=>a.y-b.y);
+  const placed=[];
+  for(const it of items){
+    it.bx=it.x-it.W/2;it.by=it.y-H/2;
+    for(let k=0;k<30;k++){const hit=placed.find(p=>Math.abs((p.bx+p.W/2)-(it.bx+it.W/2))<(p.W+it.W)/2+gap&&Math.abs(p.by-it.by)<H+gap);if(!hit)break;it.by=hit.by+H+gap;}
+    placed.push(it);
+  }
+  const g=layer.selectAll('g.balao').data(items,d=>d.id).join(enter=>{
+    const g=enter.append('g').attr('class','balao');g.append('rect');g.append('text').attr('class','tn');g.append('text').attr('class','tl');g.append('text').attr('class','tf');g.append('text').attr('class','te');return g});
+  g.attr('class','balao'+(extraClass?' '+extraClass:''))
+   .attr('transform',d=>`translate(${d.bx},${d.by})`)
+   .on('mousemove',(ev,d)=>onTip(ev,d)).on('mouseleave',hideTip).on('click',(ev,d)=>onTip(ev,d));
+  g.select('rect').attr('width',d=>d.W).attr('height',H).attr('rx',3*u);
+  g.select('text.tn').attr('x',d=>d.W/2).attr('y',H*0.38).attr('text-anchor','middle').attr('font-size',fn).attr('font-weight',600).attr('fill','var(--fg)').text(d=>d.nome);
+  g.select('text.tl').attr('x',d=>d.W/2-2*u).attr('y',H*0.86).attr('text-anchor','end').attr('font-size',fs).attr('fill','var(--lula)').text(d=>d.pl);
+  g.select('text.tl').attr('y',(comEsp?22:H*0.86/u)*u);g.select('text.tf').attr('y',(comEsp?22:H*0.86/u)*u);
+  g.select('text.tf').attr('x',d=>d.W/2+2*u).attr('text-anchor','start').attr('font-size',fs).attr('fill','var(--flavio)').text(d=>d.pf);
+  g.select('text.te').attr('x',d=>d.W/2).attr('y',32*u).attr('text-anchor','middle').attr('font-size',fe).attr('font-weight',600).style('display',comEsp?null:'none')
+    .html(d=>d.esp?`<tspan fill="var(--muted)">pesq. </tspan><tspan fill="var(--lula)">${d.esp.l}%</tspan><tspan fill="var(--muted)"> · </tspan><tspan fill="var(--flavio)">${d.esp.f}%</tspan>`:'');
+}
+
+/* placar dentro do mapa: posição em unidades do viewBox; escala um pouco no celular */
+function painelSVG(svg,x,y,tot,linhas,u,W0,smax){
+  const s=Math.min(smax||2.1,Math.max(1,u*0.9));const W=(W0||230)*s,H=(72+14*linhas.length)*s;
+  const b=tot.lula+tot.flavio+(tot.restante||0),pl=fp(pct(tot.lula,b)),pf=fp(pct(tot.flavio,b)),pr=fp(pct(tot.restante||0,b));
+  const g=svg.selectAll('g.painel').data([0]).join('g').attr('class','painel').attr('transform',`translate(${x},${y})`);
+  g.html(`<rect width="${W}" height="${H}" rx="${4*s}"></rect>
+   <text x="${10*s}" y="${30*s}" font-size="${26*s}" font-weight="900" fill="var(--lula)">${pl}</text>
+   <text x="${W/2}" y="${24*s}" font-size="${12*s}" font-weight="800" fill="var(--muted)" text-anchor="middle">${pr}</text>
+   <text x="${W/2}" y="${33*s}" font-size="${6.5*s}" font-weight="700" fill="var(--muted)" text-anchor="middle" letter-spacing=".06em">RESTANTE</text>
+   <text x="${W-10*s}" y="${30*s}" font-size="${26*s}" font-weight="900" fill="var(--flavio)" text-anchor="end">${pf}</text>
+   <text x="${10*s}" y="${44*s}" font-size="${8.5*s}" font-weight="800" fill="var(--fg)" letter-spacing=".04em">LULA</text>
+   <text x="${W-10*s}" y="${44*s}" font-size="${8.5*s}" font-weight="800" fill="var(--fg)" text-anchor="end" letter-spacing=".04em">FLÁVIO BOLSONARO</text>
+   <text x="${10*s}" y="${55*s}" font-size="${7.5*s}" font-weight="500" fill="var(--muted)">${fmt(tot.lula)} votos</text>
+   <text x="${W/2}" y="${55*s}" font-size="${7*s}" font-weight="500" fill="var(--muted)" text-anchor="middle">${fmt(tot.restante||0)} outros, brancos e nulos</text>
+   <text x="${W-10*s}" y="${55*s}" font-size="${7.5*s}" font-weight="500" fill="var(--muted)" text-anchor="end">${fmt(tot.flavio)} votos</text>
+   <line x1="${10*s}" x2="${W-10*s}" y1="${61*s}" y2="${61*s}" stroke="var(--line)" stroke-width="${0.6*s}"/>
+   ${linhas.map((l,i)=>`<text x="${10*s}" y="${(72+14*i)*s}" font-size="${7.5*s}" font-weight="${i===0?700:500}" fill="${i===0?'var(--fg)':'var(--muted)'}">${l}</text>`).join('')}`);
+}
+function alturaMapa(el,legSel){const hdr=$('header').offsetHeight||60,h2=el.previousElementSibling?.offsetHeight||22;return Math.max(280,innerHeight-hdr-8-16-h2-12)}
+let zoomT=d3.zoomIdentity, zoomBeh=null, svgW=null;
+function mapaMundo(d){
+  const el=$('#mapa-mundo');const wpx=el.getBoundingClientRect().width||960;const hpx=Math.max(300,Math.min(wpx*0.62,alturaMapa(el,'#p-ext .legenda')));
+  const H=470,W=Math.round(H*wpx/hpx),mm5=Math.round(19*W/wpx);
+  const svg=d3.select(el).selectAll('svg').data([0]).join('svg').attr('viewBox',`0 0 ${W} ${H}`).style('width','100%').style('height',hpx+'px');svgW=svg;
+  const proj=d3.geoNaturalEarth1().fitExtent([[mm5,2],[W-mm5,H-mm5]],{type:'Sphere'});const path=d3.geoPath(proj);
+  const porPais=new Map(d.lista.map(x=>[x.pais,x]));
+  const gm=svg.selectAll('g.m').data([0]).join('g').attr('class','m');
+  const gb=svg.selectAll('g.b').data([0]).join('g').attr('class','b');
+  painelSVG(svg,8,H-(72+14*d.linhas.length)-8,d.tot,d.linhas,W/(el.getBoundingClientRect().width||W),250,1.0);
+  gm.selectAll('path.esfera').data([0]).join('path').attr('class','esfera').attr('d',path({type:'Sphere'})).attr('fill','var(--soft)');
+  gm.selectAll('path.pais').data(PAISES.features.filter(f=>f.id!=='010'),f=>f.id).join('path').attr('class','pais').attr('d',path)
+    .attr('fill',f=>{const x=porPais.get(f.id);if(!x)return 'var(--sem)';return x.lula>=x.flavio?'var(--lula)':'var(--flavio)'})
+    .attr('fill-opacity',f=>porPais.get(f.id)?.6:1)
+    .on('mousemove',(ev,f)=>{const x=porPais.get(f.id);showTip(ev,x?tipPais(x):`<b>${f.properties.name}</b><br>Sem apuração ainda`)}).on('mouseleave',hideTip);
+  const feats0=PAISES.features.filter(f=>f.id!=='010');
+  gm.selectAll('text.nome').data(feats0,f=>f.id).join('text').attr('class','nome').attr('x',f=>path.centroid(f)[0]).attr('y',f=>path.centroid(f)[1]).attr('dy','.35em').text(f=>NOMEPAIS[f.id]||f.properties.name).each(function(f){f.__area=path.area(f)});
+  const rs=d3.scaleSqrt().domain([0,d3.max(d.porCidade,c=>c.validos)||1]).range([2,14]);
+  gm.selectAll('circle.cid').data(d.porCidade,c=>c.cod).join('circle').attr('class','cid')
+    .attr('cx',c=>proj([c.lon,c.lat])[0]).attr('cy',c=>proj([c.lon,c.lat])[1]).attr('r',c=>rs(c.validos))
+    .attr('fill',c=>c.lula>=c.flavio?'var(--lula)':'var(--flavio)').attr('fill-opacity',.9);
+  // âncora do balão: centróide do país quando o polígono existe, senão a média das cidades
+  const feats=new Map(PAISES.features.map(f=>[f.id,f]));
+  const itens=d.lista.map(x=>{const f=feats.get(x.pais);let p=f?path.centroid(f):proj([x.lon,x.lat]);if(!p||isNaN(p[0]))p=proj([x.lon,x.lat]);
+    // países grandes com consulados concentrados: usa a média das cidades (EUA, Canadá, Austrália, Rússia, China)
+    if(['840','124','036','643','156'].includes(x.pais))p=proj([x.lon,x.lat]);
+    const b=x.lula+x.flavio+(x.restante||0);return {id:x.pais,nome:x.nome,gx:p[0],gy:p[1],pl:fp0(pct(x.lula,b)),pf:fp0(pct(x.flavio,b)),dado:x}});
+  function desenhar(){gm.attr('transform',zoomT);const u=W/(el.getBoundingClientRect().width||W);const k=zoomT.k;
+    gm.selectAll('text.nome').attr('font-size',7.5*u/k).style('display',f=>(k>=1.4&&f.__area*k*k>700*u*u)?null:'none');
+    itens.forEach(i=>{const q=zoomT.apply([i.gx,i.gy]);i.x=q[0];i.y=q[1]});
+    balões(gb,itens.filter(i=>i.x>-40&&i.x<W+40&&i.y>-20&&i.y<H+20),u,(ev,i)=>showTip(ev,tipPais(i.dado)))}
+  if(!zoomBeh||zoomBeh.__W!==W){zoomBeh=d3.zoom().scaleExtent([1,3]).translateExtent([[0,0],[W,H]]).on('zoom',ev=>{zoomT=ev.transform;desenhar()});zoomBeh.__W=W;svg.call(zoomBeh);
+    $('#z-in').onclick=()=>svg.transition().call(zoomBeh.scaleBy,1.6);$('#z-out').onclick=()=>svg.transition().call(zoomBeh.scaleBy,1/1.6);$('#z-reset').onclick=()=>svg.transition().call(zoomBeh.transform,d3.zoomIdentity);
+    addEventListener('resize',desenhar)}
+  desenhar();
+}
+function tipPais(x){const b=x.lula+x.flavio+(x.restante||0);return `<b>${x.nome}</b>${x.situacao==='parcial'?' · parcial':''}<br>Lula <b>${fmt(x.lula)}</b> (${fp(pct(x.lula,b))})<br>Flávio Bolsonaro <b>${fmt(x.flavio)}</b> (${fp(pct(x.flavio,b))})<br>Restante <b>${fmt(x.restante||0)}</b> (${fp(pct(x.restante||0,b))})${x.validos?`<br>Válidos apurados: <b>${fmt(x.validos)}</b>`:''}${x.cidades?`<br><span style="opacity:.75">${x.cidades.join(', ')}</span>`:''}`}
+function tabelaExt(d){
+  if(!$('#tab-ext'))return;
+  if(!d.lista.length){$('#tab-ext').innerHTML='<div class="vazio">Nenhum país apurado ainda.</div>';return}
+  $('#tab-ext').innerHTML=`<table><thead><tr><th>País</th><th>Lula</th><th>%</th><th>Flávio Bolsonaro</th><th>%</th><th>Válidos</th><th>Cidades</th><th>Situação</th></tr></thead><tbody>${d.lista.map(x=>{const b=x.lula+x.flavio;const l=x.lula>=x.flavio;return `<tr><td><span class="sw" style="background:${l?'var(--lula)':'var(--flavio)'}"></span>${x.nome}</td><td>${fmt(x.lula)}</td><td>${fp(pct(x.lula,b))}</td><td>${fmt(x.flavio)}</td><td>${fp(pct(x.flavio,b))}</td><td>${fmt(x.validos)}</td><td style="white-space:normal;text-align:left;color:var(--muted)">${x.cidades.join(', ')}</td><td>${x.situacao==='oficial'?'TSE':x.situacao==='parcial'?'parcial (BU)':'completo (BU)'}</td></tr>`}).join('')}</tbody></table>`;
+}
+
+/* ---------- Brasil ---------- */
+function esperado(uf){const r=PESQ?.uf_regiao?.[uf];const e=r&&PESQ.regioes[r];return e?{regiao:r,lula:e.lula,flavio:e.flavio}:null}
+function dadosBR(){
+  const br=LIVE?.br, ufs=LIVE?.ufs||{};
+  const lista=BRUF.features.map(f=>{const uf=f.id,r=ufs[uf];const lula=r?.cand['13']?.votos||0,flavio=r?.cand['22']?.votos||0,restante=Math.max(0,(r?.votos.total||0)-lula-flavio);
+    return {uf,nome:f.properties.nome,lula,flavio,restante,validos:r?.votos.validos||0,secoes:r?.secoes||{total:0,totalizadas:0,pct:'0,00'},cand:r?.cand||{},esp:esperado(uf),tem:!!(r&&r.secoes.totalizadas)}}).sort((a,b)=>b.validos-a.validos||a.nome.localeCompare(b.nome));
+  const tl=br?.cand['13']?.votos||0,tf=br?.cand['22']?.votos||0;
+  return {br,lista,tot:{lula:tl,flavio:tf,restante:Math.max(0,(br?.votos.total||0)-tl-tf),validos:br?.votos.validos||0},tem:!!(br&&br.secoes.totalizadas>0)};
+}
+let zoomTB=d3.zoomIdentity, zoomBehB=null;
+function mapaBR(d){
+  const el=$('#mapa-br');const wpx=el.getBoundingClientRect().width||760;const hpx=Math.max(320,Math.min(wpx*0.95,alturaMapa(el,'#leg-br')));
+  const H=560,W=Math.round(H*wpx/hpx),mm5=Math.round(19*W/wpx);
+  const svg=d3.select(el).selectAll('svg').data([0]).join('svg').attr('viewBox',`0 0 ${W} ${H}`).style('width','100%').style('height',hpx+'px');
+  const proj=d3.geoMercator().fitExtent([[mm5,2],[W-mm5,H-mm5]],BRUF);const path=d3.geoPath(proj);
+  const m=new Map(d.lista.map(x=>[x.uf,x]));
+  const gm=svg.selectAll('g.m').data([0]).join('g').attr('class','m'), gb=svg.selectAll('g.b').data([0]).join('g').attr('class','b');
+  gm.selectAll('path.uf').data(BRUF.features,f=>f.id).join('path').attr('class','uf').attr('d',path).style('cursor','default')
+    .attr('fill',f=>{const x=m.get(f.id);const src=x.tem?x:(x.esp?{lula:x.esp.lula,flavio:x.esp.flavio}:null);if(!src)return 'var(--sem)';return src.lula>=src.flavio?'var(--lula)':'var(--flavio)'})
+    .attr('fill-opacity',f=>m.get(f.id).tem?.7:.3)
+    .on('mousemove',(ev,f)=>showTip(ev,tipUF(m.get(f.id)))).on('mouseleave',hideTip);
+  gm.selectAll('text.nome').data(BRUF.features,f=>f.id).join('text').attr('class','nome').attr('x',f=>path.centroid(f)[0]).attr('y',f=>path.centroid(f)[1]).text(f=>f.properties.nome);
+  const itens=BRUF.features.map(f=>{const x=m.get(f.id),c=path.centroid(f);const bt=x.lula+x.flavio+x.restante;const src=x.tem?{l:pct(x.lula,bt),f:pct(x.flavio,bt)}:(x.esp?{l:x.esp.lula,f:x.esp.flavio}:null);
+    return src?{id:f.id,nome:f.id,gx:c[0],gy:c[1],pl:fp0(src.l),pf:fp0(src.f),dado:x,esp:(x.tem&&x.esp)?{l:x.esp.lula,f:x.esp.flavio}:null}:null}).filter(Boolean);
+  function desenhar(){gm.attr('transform',zoomTB);const u=W/(el.getBoundingClientRect().width||W);const k=zoomTB.k;
+    gm.selectAll('text.nome').attr('font-size',8.5*u/k).attr('dy',(d.tem?30:24)*u/k).style('display',k>=1.4?null:'none');
+    painelSVG(svg,8,H-(72+14*d.linhas.length)-8,d.tot,d.linhas,u,250,1.0);
+    itens.forEach(i=>{const q=zoomTB.apply([i.gx,i.gy]);i.x=q[0];i.y=q[1]});
+    balões(gb,itens.filter(i=>i.x>-40&&i.x<W+40&&i.y>-20&&i.y<H+20),u,(ev,i)=>showTip(ev,tipUF(i.dado)),d.tem?'':'esp')}
+  if(!zoomBehB||zoomBehB.__W!==W){zoomBehB=d3.zoom().scaleExtent([1,3]).translateExtent([[0,0],[W,H]]).on('zoom',ev=>{zoomTB=ev.transform;desenhar()});zoomBehB.__W=W;svg.call(zoomBehB);
+    $('#zb-in').onclick=()=>svg.transition().call(zoomBehB.scaleBy,1.6);$('#zb-out').onclick=()=>svg.transition().call(zoomBehB.scaleBy,1/1.6);$('#zb-reset').onclick=()=>svg.transition().call(zoomBehB.transform,d3.zoomIdentity);
+    addEventListener('resize',desenhar)}
+  desenhar();
+  $('#br-modo').textContent=d.tem?'apurado pelo TSE':'antes da contagem: expectativa das pesquisas (Datafolha por região, válidos)';
+  $('#leg-br').innerHTML=(d.tem?`<span><i style="background:var(--lula)"></i>Lula à frente</span><span><i style="background:var(--flavio)"></i>Flávio Bolsonaro à frente</span><span><i style="background:var(--sem)"></i>Sem seções totalizadas</span>`:`<span><i style="background:var(--lula);opacity:.4"></i>Lula à frente nas pesquisas</span><span><i style="background:var(--flavio);opacity:.4"></i>Flávio à frente nas pesquisas</span>`)+`<span>balão: <b class="l">% Lula</b> · <b class="f">% Flávio</b></span>`;
+}
+function tipUF(x){const b=x.lula+x.flavio+(x.restante||0);let s=`<b>${x.nome}</b>`;
+  if(x.tem)s+=`<br>Lula <b>${fmt(x.lula)}</b> (${fp(pct(x.lula,b))}) · Flávio <b>${fmt(x.flavio)}</b> (${fp(pct(x.flavio,b))}) · Restante <b>${fmt(x.restante||0)}</b> (${fp(pct(x.restante||0,b))})<br>Seções: ${fmt(x.secoes.totalizadas)} de ${fmt(x.secoes.total)} (${x.secoes.pct}%)`;
+  else s+=`<br>Sem seções totalizadas`;
+  if(x.esp)s+=`<br><span style="opacity:.8">Esperado (${x.esp.regiao}): Lula ${x.esp.lula}% · Flávio ${x.esp.flavio}%</span>`;return s}
+function tabelaBR(d){
+  if($('#tab-br'))$('#tab-br').innerHTML=`<table><thead><tr><th>Estado</th><th>Região</th><th>Esperado Lula</th><th>Esperado Flávio</th><th>Apurado Lula</th><th>Apurado Flávio</th><th>Dif. Lula</th><th>Seções</th></tr></thead><tbody>${d.lista.map(x=>{const b=x.lula+x.flavio,al=x.tem?pct(x.lula,b):null;const dif=(al!=null&&x.esp)?al-x.esp.lula:null;
+    return `<tr><td>${x.nome}</td><td style="text-align:left;color:var(--muted)">${x.esp?.regiao||'–'}</td><td class="l">${x.esp?x.esp.lula+'%':'–'}</td><td class="f">${x.esp?x.esp.flavio+'%':'–'}</td><td class="l">${al!=null?fp(al):'–'}</td><td class="f">${al!=null?fp(100-al):'–'}</td><td>${dif!=null?(dif>0?'+':'')+dif.toFixed(1)+' pp':'–'}</td><td>${x.secoes.pct}%</td></tr>`}).join('')}</tbody></table>`;
+  $('#reg-br').innerHTML=`<table><thead><tr><th>Região</th><th>Lula</th><th>Flávio</th></tr></thead><tbody>${Object.entries(PESQ.regioes).filter(([k])=>k!=='fonte').map(([k,v])=>`<tr><td>${k}</td><td class="l">${v.lula}%</td><td class="f">${v.flavio}%</td></tr>`).join('')}</tbody></table>`;
+}
+
+/* ---------- pesquisas e mercados ---------- */
+function pesquisas(){
+  const n=PESQ.nacionais, ml=d3.mean(n,p=>p.lula), mf=d3.mean(n,p=>p.flavio);
+  score($('#score-pesq'),{lula:ml,flavio:mf},{l:`média de ${n.length} pesquisas: ${fp(ml)} do total`,f:`média de ${n.length} pesquisas: ${fp(mf)} do total`});
+  const mk=(LIVE?.mercados||[]).filter(x=>/quem vence a eleição/.test(x.nome)&&x.lula!=null&&x.flavio!=null);
+  if(mk.length){const al=d3.mean(mk,x=>x.lula),af=d3.mean(mk,x=>x.flavio);score($('#score-apostas'),{lula:al,flavio:af},{l:`média de ${mk.length} mercados: ${fp(al)} de chance de vencer`,f:`média de ${mk.length} mercados: ${fp(af)} de chance de vencer`})}
+  else $('#score-apostas').innerHTML='<div class="vazio">Sem leitura dos mercados.</div>';
+  $('#faixa-pesq').innerHTML=`<span>Os dois placares mostram a participação de cada um na soma dos dois. Pesquisas: intenção de voto no 1.º turno. Apostas: probabilidade de vencer a eleição (inclui 2.º turno) na Polymarket e na PredictIt, que perguntam a mesma coisa; Kalshi e Manifold perguntam outras coisas e ficam só na tabela.</span>`;
+  $('#tab-pesq').innerHTML=`<table><thead><tr><th>Instituto</th><th>Campo</th><th>Lula</th><th>Flávio</th><th>Dif.</th></tr></thead><tbody>${n.map(p=>`<tr><td>${p.instituto}${p.conferida?'':'<span class="tag">a conferir</span>'}</td><td style="text-align:left;color:var(--muted)">${p.data}</td><td class="l">${fp(p.lula)}</td><td class="f">${fp(p.flavio)}</td><td>${(p.lula-p.flavio>0?'+':'')+(p.lula-p.flavio).toFixed(1)}</td></tr>`).join('')}</tbody></table><div class="mini">${PESQ.nota}</div>`;
+  const br=dadosBR();
+  if(br.tem){const b=br.tot.lula+br.tot.flavio,al=pct(br.tot.lula,b),el=pct(ml,ml+mf);
+    $('#comp-pesq').innerHTML=`<table><thead><tr><th></th><th>Lula</th><th>Flávio</th></tr></thead><tbody><tr><td>Expectativa (média das pesquisas, entre os dois)</td><td class="l">${fp(el)}</td><td class="f">${fp(100-el)}</td></tr><tr><td>Apurado no Brasil (${br.br.secoes.pct}% das seções)</td><td class="l">${fp(al)}</td><td class="f">${fp(100-al)}</td></tr><tr><td>Diferença</td><td>${(al-el>0?'+':'')+(al-el).toFixed(1)} pp</td><td>${(el-al>0?'+':'')+(el-al).toFixed(1)} pp</td></tr></tbody></table>`}
+  else $('#comp-pesq').innerHTML='<div class="vazio">A comparação aparece aqui quando o TSE começar a totalizar (17h de Brasília). O mapa do Brasil já mostra a expectativa regional.</div>';
+  const m=LIVE?.mercados;if(!m||!m.length)return;
+  $('#mercados').className='';$('#mercados').innerHTML=`<table><thead><tr><th>Mercado</th><th>Lula</th><th>Flávio</th><th>Atualizado</th></tr></thead><tbody>${m.map(x=>`<tr><td style="white-space:normal">${x.nome}</td>${x.unico!=null?`<td colspan="2" style="text-align:center">${fp(x.unico)} (sim)</td>`:`<td class="l">${x.lula==null?'–':fp(x.lula)}</td><td class="f">${x.flavio==null?'–':fp(x.flavio)}</td>`}<td style="color:var(--muted)">${x.atualizado||''}</td></tr>`).join('')}</tbody></table>`;
+}
+
+/* ---------- mídia ---------- */
+function midia(){
+  if(!MID){$('#duelo').innerHTML='<div class="vazio">Sem leitura de mídia ainda.</div>';return}
+  const I=MID.imprensa,R=MID.redes;
+  const duelo=(tit,l,f,sub,nl='Lula',nf='Flávio')=>{const t=l+f||1;return `<div class="card"><h2>${tit}</h2><div class="barra"><i class="l" style="width:${100*l/t}%"></i><i class="f" style="width:${100*f/t}%"></i></div><div class="barra-leg"><span class="l"><b>${fp0(100*l/t)}</b> ${nl} · ${fmt(l)}</span><span class="f">${fmt(f)} · ${nf} <b>${fp0(100*f/t)}</b></span></div><div class="mini">${sub}</div></div>`};
+  const Qc=R.quadrantes?.ok?R.quadrantes.contagem:null;
+  $('#duelo-redes').innerHTML=Qc?duelo('Redes sociais: discurso do bem, de onde vem',Qc.esquerda.bem,Qc.direita.bem,`posts de apoio ao próprio lado, sem ataque, entre ${fmt(R.quadrantes.classificados)} classificados desde hoje 4/10, 00h01.`,'Esquerda','Direita')
+    +duelo('Redes sociais: discurso de ódio, de onde vem',Qc.esquerda.odio,Qc.direita.odio,`posts com insulto, desumanização, ameaça ou incitação contra o outro lado, entre ${fmt(R.quadrantes.classificados)} classificados.`,'Esquerda','Direita'):'<div class="card vazio">Classificação ainda não rodou.</div>';
+  $('#duelo').innerHTML=duelo('Imprensa, últimas 3 h',I.lula.ultimas3h,I.flavio.ultimas3h,`manchetes que citam cada um (Google Notícias, Brasil). Última hora: Lula ${I.lula.ultima1h}, Flávio ${I.flavio.ultima1h}.`)
+    +duelo('Redes, últimas 3 h',R.por_lado.lula.ultimas3h,R.por_lado.flavio.ultimas3h,`posts que citam cada um (${fmt(R.posts_total)} posts guardados desde hoje 4/10, 00h01).`);
+  // histograma 24h (redes + imprensa somados por hora, 0 = hora atual)
+  const W=1400,H=150,pad={l:34,r:8,t:8,b:22},n=24;
+  const sl=I.lula.por_hora.map((v,i)=>v+(R.por_lado.lula.por_hora[i]||0)),sf=I.flavio.por_hora.map((v,i)=>v+(R.por_lado.flavio.por_hora[i]||0));
+  const mx=Math.max(1,...sl,...sf),x=d3.scaleBand().domain(d3.range(n)).range([pad.l,W-pad.r]).paddingInner(.25),y=d3.scaleLinear().domain([0,mx]).range([H-pad.b,pad.t]);
+  const bw=x.bandwidth()/2-1;
+  if($('#hist'))$('#hist').innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="menções por hora">${[0,Math.round(mx/2),mx].map(v=>`<line x1="${pad.l}" x2="${W-pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width=".5"/><text x="${pad.l-4}" y="${y(v)+3}" text-anchor="end" font-size="9" fill="var(--muted)">${v}</text>`).join('')}
+    ${d3.range(n).map(i=>{const h=n-1-i;const xi=x(h);return `<rect x="${xi}" y="${y(sl[h])}" width="${bw}" height="${y(0)-y(sl[h])}" rx="2" fill="var(--lula)"/><rect x="${xi+bw+2}" y="${y(sf[h])}" width="${bw}" height="${y(0)-y(sf[h])}" rx="2" fill="var(--flavio)"/>${i%2===0?`<text x="${xi+bw}" y="${H-6}" text-anchor="middle" font-size="9" fill="var(--muted)">${h===0?'agora':'-'+h+'h'}</text>`:''}`}).join('')}</svg>`;
+  const T=R.termos||[];const mtt=T[0]?.[1]||1;
+  $('#termos').innerHTML=T.slice(0,30).map(([t,n,n3])=>`<span class="chip" style="font-size:${(.78+.55*n/mtt).toFixed(2)}rem">${t} <b>${fmt(n)}</b>${n3?`<small style="color:var(--muted)"> · ${n3} na última 3 h</small>`:''}</span>`).join('')||'<span class="vazio">sem leitura</span>';
+  const mt=R.hashtags[0]?.[1]||1;
+  $('#chips').innerHTML=R.hashtags.slice(0,24).map(([t,c])=>`<span class="chip" style="font-size:${(.78+.5*c/mt).toFixed(2)}rem">#${t} <b>${c}</b></span>`).join('');
+  $('#tags-nota').textContent=`${fmt(R.posts_total)} posts guardados desde hoje 4/10, 00h01: Bluesky ${fmt(R.bluesky||0)}, Mastodon ${fmt(R.mastodon||0)}, chat ao vivo do YouTube ${fmt(R.youtube||0)}${R.youtube_canais?' ('+Object.entries(R.youtube_canais).map(([k,v])=>k+' '+fmt(v)).join(', ')+')':''}. Busca por nomes e termos, não só hashtags. Menções: últimas 24 h e 3 h; hashtags: desde hoje 00h01.`;
+  if(TR&&TR.series){const s=TR.series,ult=k=>s[k]?s[k][s[k].length-1][1]:null;const chips=k=>(TR.relacionadas?.[k]||[]).slice(0,6).map(([q,v])=>`<span class="chip">${q} <b>${v==='Breakout'?'em alta':'+'+v+'%'}</b></span>`).join('');
+    $('#trends-card').hidden=false;$('#trends').innerHTML=`<div class="duelo" style="margin:0"><div><div class="n" style="font:800 2rem/1 var(--display)"><span class="l">${ult('Lula')??'–'}</span> <span style="color:var(--muted);font-size:1rem">Lula</span> &nbsp; <span class="f">${ult('Flávio Bolsonaro')??'–'}</span> <span style="color:var(--muted);font-size:1rem">Flávio Bolsonaro</span></div><div class="mini">${TR.nota} Outros termos agora: ${['Bolsonaro','urna','fraude','PT','PL','esquerda','direita','TSE'].filter(k=>s[k]).map(k=>k+' '+ult(k)).join(' · ')}.</div></div><div><div class="mini" style="margin:0 0 4px">Buscas em alta junto com cada nome</div><div class="chips">${chips('Lula')}${chips('Flávio Bolsonaro')}</div></div></div>`}
+  const J=I.juridico;
+  const tok=s=>new Set(s.toLowerCase().normalize('NFD').replace(/[^a-z0-9 ]/g,' ').split(/\s+/).filter(w=>w.length>3));
+  const unicos=[];(J?.itens||[]).forEach(n=>{const t=tok(n.titulo);if(!unicos.some(u=>{const a=tok(u.titulo);let i=0;t.forEach(w=>{if(a.has(w))i++});return i/Math.max(1,Math.min(t.size,a.size))>0.5}))unicos.push(n)});
+  const li=n=>`<li><a href="${n.url}" target="_blank" rel="noopener">${n.titulo}</a><span class="meta">${n.efeito?n.efeito+' · ':''}${n.fonte} · ${horaCurta(n.hora)}</span></li>`;
+  const vazio=!J||!J.ok;
+  $('#jur-lula').innerHTML=vazio?'<li class="vazio">Classificação ainda não rodou.</li>':(unicos.filter(n=>n.favorece==='lula').map(li).join('')||'<li class="meta">nenhuma nas últimas 48 h</li>');
+  $('#jur-flavio').innerHTML=vazio?'<li class="vazio">Classificação ainda não rodou.</li>':(unicos.filter(n=>n.favorece==='flavio').map(li).join('')||'<li class="meta">nenhuma nas últimas 48 h</li>');
+  const outros=vazio?[]:unicos.filter(n=>n.favorece!=='lula'&&n.favorece!=='flavio');
+  $('#jur-outros').innerHTML=outros.length?`<li class="meta" style="padding-top:8px">Sem direção clara: ${outros.map(n=>`<a href="${n.url}" target="_blank" rel="noopener">${n.titulo}</a>`).join(' · ')}</li>`:'';
+  const Q=R.quadrantes;
+  if(!Q||!Q.ok)$('#quadrantes').innerHTML='<div class="vazio">Classificação ainda não rodou nesta leitura.</div>';
+  else{const c=Q.contagem,ex=Q.exemplos;const SUB={esquerda:{bem:'A favor de Lula / da esquerda, sem atacar',odio:'Da esquerda CONTRA Flávio / a direita'},direita:{bem:'A favor de Flávio / da direita, sem atacar',odio:'Da direita CONTRA Lula / a esquerda'}};
+    const TIT={esquerda:{bem:'Esquerda · discurso do bem',odio:'Esquerda · discurso de ódio'},direita:{bem:'Direita · discurso do bem',odio:'Direita · discurso de ódio'}};
+    const cel=(lado,tom)=>`<div class="cel ${tom}"><div class="tit ${lado==='esquerda'?'l':'f'}">${TIT[lado][tom]}</div><div class="n">${c[lado][tom]}<small>de ${c[lado].bem+c[lado].odio+c[lado].neutro} posts do lado</small></div><div class="sub">${SUB[lado][tom]}</div><ul>${ex[lado][tom].map(p=>`<li>${p.texto}<span class="meta">@${p.conta} · ${horaCurta(p.hora)}</span></li>`).join('')||'<li class="meta">nenhum post nesta leitura</li>'}</ul></div>`;
+    $('#quadrantes').innerHTML=`<div class="quad">${cel('esquerda','bem')}${cel('esquerda','odio')}${cel('direita','bem')}${cel('direita','odio')}</div><div class="mini">${Q.classificados} posts classificados desde hoje 4/10, 00h01, de ${fmt(R.posts_total)} guardados (${fmt(R.quadrantes.pendentes||0)} ainda na fila; cada ciclo classifica 300). Lado = de quem vem o post: quem ele apoia ou ataca; ódio = insulto, desumanização, ameaça ou incitação contra o outro lado. Cada quadrante lista os 400 mais recentes com rolagem. Neutros: ${c.neutro}. Amostra do Mastodon e do Bluesky, e do chat ao vivo do YouTube, onde a direita aparece; o X, Instagram, TikTok e Facebook não abrem os dados.</div>`}
+  $('#aviso-midia').innerHTML=`Leitura de ${hora(MID.atualizado)}, renovada a cada 3 min. <b>Cobre:</b> imprensa brasileira (Google Notícias), posts públicos do Bluesky e do Mastodon, chat ao vivo das transmissões de eleição no YouTube (Jovem Pan, Oeste, CNN, UOL, Estadão, Record e outros) e Google Trends, acumulados desde hoje 4/10, 00h01, com leitura a cada minuto. <b>Não cobre:</b> X, Instagram, TikTok e Facebook, que não abrem os dados sem contrato pago. Contagem é de menção, não de apoio: uma manchete crítica conta como menção.`;
+}
+
+/* ---------- render ---------- */
+function render(){
+  const ex=dadosExterior();
+  const nCid=new Set();ex.porCidade.forEach(c=>c.cod.split('+').forEach(k=>nCid.add(k)));
+  if(ex.oficial){const z=LIVE.zz;ex.linhas=[`Apurado: ${fp(pct(z.secoes.totalizadas,z.secoes.total))} das seções do exterior (${fmt(z.secoes.totalizadas)} de ${fmt(z.secoes.total)})`,`Eleitorado apurado: ${fmt(z.eleitorado.apurado)} de ${fmt(z.eleitorado.total)}`,`Válidos ${fmt(z.votos.validos)} · brancos ${fmt(z.votos.brancos)} · nulos ${fmt(z.votos.nulos)}`,'Totalização oficial do TSE']}
+  else{ex.linhas=[`Apurado: ${fp(pct(nCid.size,186))} das cidades com urna (${nCid.size} de 186)`,`${fmt(ex.tot.lula+ex.tot.flavio+ex.tot.restante)} votos já contabilizados · ${fmt(LIVE?.zz?.eleitorado.total||916534)} aptos no exterior`,'Parciais de boletins de urna · oficial do TSE a partir das 17h']}
+  if($('#aviso-ext'))$('#aviso-ext').innerHTML=ex.oficial?`<b>Totalização oficial do TSE</b>, atualizada ${hora(LIVE.atualizado)} (Brasília).`:`<b>Parciais lidas em boletins de urna.</b> Onde a votação já terminou, o boletim impresso em cada seção mostra os votos. A totalização oficial do TSE começa às 17h de Brasília e substitui estes números sozinha. Boletins atualizados ${hora(BU.atualizado)}.`;
+  mapaMundo(ex);tabelaExt(ex);
+  const br=dadosBR();
+  const z=br.br;br.linhas=z?[`Apurado: ${z.secoes.pct}% das seções (${fmt(z.secoes.totalizadas)} de ${fmt(z.secoes.total)})`,`Eleitorado apurado: ${fmt(z.eleitorado.apurado)} de ${fmt(z.eleitorado.total)}`,`Válidos ${fmt(z.votos.validos)} · brancos ${fmt(z.votos.brancos)} · nulos ${fmt(z.votos.nulos)}`,br.tem?'Totalização oficial do TSE':'Aguardando o TSE (17h de Brasília)']:['Aguardando o TSE'];
+  $('#como-ler').innerHTML=`<div class="chave">
+    <svg viewBox="0 0 120 64" aria-hidden="true"><g class="balao${br.tem?'':' esp'}"><rect x="30" y="18" width="60" height="28" rx="3"></rect><text x="60" y="30" text-anchor="middle" font-size="8" font-weight="600" fill="var(--fg)">SP</text><text x="57" y="42" text-anchor="end" font-size="11" font-weight="800" fill="var(--lula)">43%</text><text x="63" y="42" text-anchor="start" font-size="11" font-weight="800" fill="var(--flavio)">41%</text></g><line x1="60" y1="18" x2="60" y2="8" stroke="var(--muted)" stroke-width=".6"/><line x1="45" y1="46" x2="30" y2="58" stroke="var(--muted)" stroke-width=".6"/><line x1="75" y1="46" x2="90" y2="58" stroke="var(--muted)" stroke-width=".6"/><text x="60" y="6" text-anchor="middle" font-size="6" fill="var(--muted)">estado</text><text x="28" y="63" text-anchor="middle" font-size="6" fill="var(--lula)">Lula</text><text x="92" y="63" text-anchor="middle" font-size="6" fill="var(--flavio)">Flávio</text></svg>
+    <div class="k">Percentuais sobre o total apurado; o restante (outros, brancos e nulos) está no painel. Toque no balão: votos, seções e expectativa.</div></div>
+   <div class="estado">
+    <div class="pill${br.tem?'':' on'}"><i></i><span><b>Antes da contagem</b> · balão tracejado = expectativa das pesquisas</span></div>
+    <div class="pill${br.tem?' on':''}"><i></i><span><b>A partir das 17h</b> · balão cheio = resultado do TSE, com a expectativa das pesquisas em letra menor embaixo${br.tem?` (${br.br.secoes.pct}% das seções)`:''}</span></div>
+   </div>`;
+  mapaBR(br);tabelaBR(br);
+  pesquisas();midia();
+  const vivo=LIVE&&(Date.now()-new Date(LIVE.atualizado))<10*60*1000;
+  $('#dot').className='dot'+(vivo?'':' off');
+  $('#st').textContent=(vivo?'TSE lido ':'TSE sem leitura recente · ')+(LIVE?hora(LIVE.atualizado):'')+' · boletins '+hora(BU.atualizado)+' · atualiza sozinho a cada minuto';
+}
+let _rt=null;addEventListener('resize',()=>{clearTimeout(_rt);_rt=setTimeout(()=>{if(LIVE)render()},200)});
+carregar().catch(e=>{$('#st').textContent='erro ao carregar: '+e.message});
+setInterval(()=>carregar().catch(()=>{}),60000);
+</script>
+
+</body></html>

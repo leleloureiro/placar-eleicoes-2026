@@ -1,0 +1,26 @@
+{
+  "nota": "Pesquisas registradas no TSE, 1.º turno. Percentuais de voto estimulado (total), exceto onde indicado 'válidos'. A tabela nacional foi compilada da página de pesquisas da Wikipédia em português, que cita os institutos; a conferência com a publicação original de cada instituto está pendente. O recorte regional da Datafolha vem da divulgação de 1.º/10 (2.506 entrevistas, 29/9 a 1/10).",
+  "nacionais": [
+    {"instituto": "Datafolha", "data": "3/10", "lula": 42, "flavio": 40, "tipo": "estimulada", "conferida": false},
+    {"instituto": "Genial/Quaest", "data": "2 a 3/10", "lula": 40, "flavio": 38, "tipo": "estimulada", "conferida": false},
+    {"instituto": "AtlasIntel/Bloomberg", "data": "27/9 a 2/10", "lula": 47.0, "flavio": 44.1, "tipo": "estimulada", "conferida": false},
+    {"instituto": "CNT/MDA", "data": "30/9 a 2/10", "lula": 43.1, "flavio": 38.0, "tipo": "estimulada", "conferida": false},
+    {"instituto": "PoderData/Aya", "data": "30/9 a 2/10", "lula": 42, "flavio": 41, "tipo": "estimulada", "conferida": false},
+    {"instituto": "Gerp", "data": "30/9 a 2/10", "lula": 41, "flavio": 43, "tipo": "estimulada", "conferida": false},
+    {"instituto": "Futura", "data": "29/9 a 3/10", "lula": 42.6, "flavio": 44.8, "tipo": "estimulada", "conferida": false}
+  ],
+  "regioes": {
+    "fonte": "Datafolha, 29/9 a 1/10/2026, votos válidos",
+    "Sul": {"lula": 32, "flavio": 55},
+    "Sudeste": {"lula": 43, "flavio": 41},
+    "Nordeste": {"lula": 61, "flavio": 28},
+    "Norte e Centro-Oeste": {"lula": 37, "flavio": 45}
+  },
+  "uf_regiao": {
+    "AC": "Norte e Centro-Oeste", "AM": "Norte e Centro-Oeste", "AP": "Norte e Centro-Oeste", "PA": "Norte e Centro-Oeste", "RO": "Norte e Centro-Oeste", "RR": "Norte e Centro-Oeste", "TO": "Norte e Centro-Oeste",
+    "DF": "Norte e Centro-Oeste", "GO": "Norte e Centro-Oeste", "MT": "Norte e Centro-Oeste", "MS": "Norte e Centro-Oeste",
+    "AL": "Nordeste", "BA": "Nordeste", "CE": "Nordeste", "MA": "Nordeste", "PB": "Nordeste", "PE": "Nordeste", "PI": "Nordeste", "RN": "Nordeste", "SE": "Nordeste",
+    "ES": "Sudeste", "MG": "Sudeste", "RJ": "Sudeste", "SP": "Sudeste",
+    "PR": "Sul", "RS": "Sul", "SC": "Sul"
+  }
+}

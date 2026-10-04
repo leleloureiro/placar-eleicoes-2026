@@ -1,0 +1,26 @@
+{
+  "descricao": "Parciais do voto no exterior lidas em boletins de urna (BU) impressos nos consulados. Não é a totalização oficial do TSE, que começa às 17h de Brasília.",
+  "atualizado": "2026-10-04T11:45:00-03:00",
+  "fontes": [
+    "Exame (04/10, boletins de urna, Ásia e Oceania)",
+    "InfoMoney (04/10 09h43)",
+    "News Rondônia (04/10)",
+    "Perfil @danuzioneto no Instagram (posts 'com base nos boletins')"
+  ],
+  "entradas": [
+    {"pais": "554", "nome": "Nova Zelândia", "cidades": ["30805"], "lula": 234, "flavio": 64, "validos": 332, "comparecimento": 339, "situacao": "completo", "fonte": "Exame / InfoMoney", "hora": "2026-10-04T09:00:00-03:00"},
+    {"pais": "392", "nome": "Japão", "cidades": ["30627", "30198", "29742"], "lula": 5234, "flavio": 24601, "validos": null, "comparecimento": 36627, "aptos": 88293, "situacao": "parcial", "nota": "Tóquio, Nagóia e Hamamatsu somados; 36.627 votantes de 88.293 aptos.", "fonte": "Exame", "hora": "2026-10-04T10:30:00-03:00"},
+    {"pais": "156", "nome": "China (continental)", "cidades": ["30317", "30848", "30651"], "lula": 268, "flavio": 98, "validos": 366, "situacao": "completo", "nota": "Pequim, Xangai e Cantão.", "fonte": "Exame", "hora": "2026-10-04T10:30:00-03:00"},
+    {"pais": "344", "nome": "Hong Kong", "cidades": ["29793"], "lula": 99, "flavio": 105, "validos": null, "situacao": "completo", "fonte": "Exame", "hora": "2026-10-04T10:30:00-03:00"},
+    {"pais": "410", "nome": "Coreia do Sul", "cidades": ["30538"], "lula": 123, "flavio": 72, "validos": 216, "situacao": "completo", "fonte": "Exame / InfoMoney", "hora": "2026-10-04T09:00:00-03:00"},
+    {"pais": "608", "nome": "Filipinas", "cidades": ["30082"], "lula": 26, "flavio": 33, "validos": 62, "situacao": "completo", "fonte": "Exame / InfoMoney", "hora": "2026-10-04T09:00:00-03:00"},
+    {"pais": "702", "nome": "Singapura", "cidades": ["29548"], "lula": 190, "flavio": 92, "validos": 348, "situacao": "completo", "fonte": "Exame / InfoMoney", "hora": "2026-10-04T09:00:00-03:00"},
+    {"pais": "036", "nome": "Austrália", "cidades": ["29491", "30562"], "lula": 4562, "flavio": 2579, "validos": 8453, "situacao": "completo", "nota": "Camberra e Sydney somadas.", "fonte": "Exame / InfoMoney", "hora": "2026-10-04T09:00:00-03:00"},
+    {"pais": "458", "nome": "Malásia", "cidades": ["29890"], "lula": 44, "flavio": 27, "validos": 83, "situacao": "completo", "fonte": "Exame / InfoMoney", "hora": "2026-10-04T09:00:00-03:00"},
+    {"pais": "360", "nome": "Indonésia", "cidades": ["29840"], "lula": 8, "flavio": 19, "validos": 31, "situacao": "completo", "fonte": "Exame", "hora": "2026-10-04T10:30:00-03:00"},
+    {"pais": "764", "nome": "Tailândia", "cidades": ["29343"], "lula": 40, "flavio": 51, "validos": 102, "situacao": "completo", "fonte": "Exame / InfoMoney", "hora": "2026-10-04T09:00:00-03:00"},
+    {"pais": "784", "nome": "Emirados Árabes Unidos", "cidades": ["29262"], "lula": 512, "flavio": 659, "validos": 1396, "situacao": "completo", "nota": "Abu Dhabi.", "fonte": "Exame", "hora": "2026-10-04T10:30:00-03:00"},
+    {"pais": "158", "nome": "Taiwan", "cidades": ["30570"], "lula": 77, "flavio": 107, "validos": 219, "situacao": "completo", "nota": "Taipé; 219 votos nominais.", "fonte": "@danuzioneto (boletins)", "hora": "2026-10-04T10:00:00-03:00"},
+    {"pais": "356", "nome": "Índia", "cidades": ["30210", "30171"], "lula": 24, "flavio": 26, "validos": null, "situacao": "parcial", "nota": "Duas seções de várias.", "fonte": "News Rondônia", "hora": "2026-10-04T10:00:00-03:00"}
+  ]
+}
